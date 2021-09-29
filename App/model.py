@@ -38,6 +38,24 @@ los mismos.
 """
 
 # Construccion de modelos
+def newCatalog():
+    """
+    Inicializa el catálogo de obras. Crea una lista vacia para guardar
+    todas las obras, adicionalmente, crea una lista vacia para los artistas.
+     Retorna el catalogo inicializado.
+    """
+    catalog = {'obras': None,
+               'artistas': None,
+               'medio': None}
+
+    catalog['obras'] = lt.newList(datastructure='ARRAY_LIST')
+    catalog['artistas'] = lt.newList(datastructure='ARRAY_LIST')
+    catalog['medio'] = mp.newMap(50,
+                                maptype='CHAINING',
+                                loadfactor=0.75,
+                                comparefunction=compareMapBookIds)
+
+    return catalog
 
 # Funciones para agregar informacion al catalogo
 
