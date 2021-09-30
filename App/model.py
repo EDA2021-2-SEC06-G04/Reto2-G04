@@ -29,7 +29,7 @@ import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort
 assert cf
 
 """
@@ -50,19 +50,61 @@ def newCatalog():
 
     catalog['obras'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['artistas'] = lt.newList(datastructure='ARRAY_LIST')
-    catalog['medio'] = mp.newMap(50,
+    catalog['medio'] = mp.newMap(30,
                                 maptype='CHAINING',
                                 loadfactor=0.75,
-                                comparefunction=compareMapBookIds)
+                                comparefunction=compareMapObrasMedios)
 
     return catalog
 
 # Funciones para agregar informacion al catalogo
+def addObra(catalog, obra):
+    lt.addLast(catalog['obras'], obra)
+    try:
+        lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
+    except:
+        mp.put(catalog['medio'],obra['Medium'],lt.newList(datastructure='ARRAY_LIST')) 
+        lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
+def addArtista(catalog, artista):
+    lt.addLast(catalog['artistas'], artista)
+
+
 
 # Funciones para creacion de datos
 
 # Funciones de consulta
+def antiguaspormedio(n,medio,catalog):
+    lista = lt.subList(me.getValue(mp.get(catalog['medio'],medio)),1,n)
+    return lista
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
+def organizarfechas(obras):
+    """
+    Organiza las obras por su año de creación
+    """
+    mergesort.sort(obras,cmpArtworkByDate)
+
+# Funciones de comparación
+def compareMapObrasMedios(keyname, medio):
+    """
+    Compara dos medios. El primero es una cadena
+    y el segundo un entry de un map
+    """
+    medioentry = me.getKey(medio)
+    if (keyname == medioentry):
+        return 0
+    elif (keyname > medioentry):
+        return 1
+    else:
+        return -1
+
+def cmpArtworkByDate(artwork1, artwork2):
+    """
+    Devuelve verdadero (True) si el 'Date' de artwork1 es menores que el de artwork2
+    Args:
+    artwork1: informacion de la primera obra que incluye su valor 'Date'
+    artwork2: informacion de la segunda obra que incluye su valor 'Date'
+    """
+    return artwork1['Date'] < artwork2['Date']
