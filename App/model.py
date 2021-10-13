@@ -52,8 +52,16 @@ def newCatalog():
     catalog['artistas'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['medio'] = mp.newMap(30,
                                 maptype='CHAINING',
-                                loadfactor=0.75,
+                                loadfactor=4.0,
                                 comparefunction=compareMapObrasMedios)
+    catalog['nacionalidad'] = mp.newMap(30,
+                                maptype='CHAINING',
+                                loadfactor=4.0,
+                                )
+    catalog['id'] = mp.newMap(2000,
+                                maptype='PROBING',
+                                loadfactor=0.5,
+                                )
 
     return catalog
 
@@ -65,8 +73,34 @@ def addObra(catalog, obra):
     except:
         mp.put(catalog['medio'],obra['Medium'],lt.newList(datastructure='ARRAY_LIST')) 
         lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
+    
+def nacionalidades(catalog):
+    for obra in lt.iterator(catalog['obras']):
+        idsobra = obra['ConstituentID']
+        x = idsobra.replace('[','')
+        y = x.replace(']','')
+        z = y.replace(' ','')
+        ids = z.split(',')
+        nacionalidades = lt.newList(datastructure='ARRAY_LIST')
+        for id in ids:
+            if lt.isPresent(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality']) == False:
+                #print(ids)
+                lt.addLast(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality'])
+                #print(nacionalidades)
+        for paisartista in lt.iterator(nacionalidades):
+            try:
+                #print(paisartista)
+                #print(mp.get(catalog['nacionalidad'],paisartista))
+                lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
+            except:
+                mp.put(catalog['nacionalidad'],paisartista,lt.newList(datastructure='ARRAY_LIST')) 
+                lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
+            
+
+
 def addArtista(catalog, artista):
     lt.addLast(catalog['artistas'], artista)
+    mp.put(catalog['id'],artista['ConstituentID'],artista)
 
 
 
@@ -99,6 +133,8 @@ def compareMapObrasMedios(keyname, medio):
         return 1
     else:
         return -1
+
+        
 
 def cmpArtworkByDate(artwork1, artwork2):
     """

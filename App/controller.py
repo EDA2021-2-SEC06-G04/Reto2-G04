@@ -44,9 +44,10 @@ def loadData(catalog):
     Carga los datos de los archivos y cargar los datos en la
     estructura de datos
     """
-    loadObras(catalog)
-    loadArtistas(catalog)
     
+    loadArtistas(catalog)
+    loadObras(catalog)
+    model.nacionalidades(catalog)
 
 
 def loadObras(catalog):
@@ -68,6 +69,7 @@ def loadArtistas(catalog):
     input_file = csv.DictReader(open(file, encoding='utf-8'))
     for artista in input_file:
         model.addArtista(catalog, artista)
+    
 
 # Funciones de ordenamiento
 
