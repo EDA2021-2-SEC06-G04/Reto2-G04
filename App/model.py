@@ -52,15 +52,15 @@ def newCatalog():
     catalog['artistas'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['medio'] = mp.newMap(30,
                                 maptype='CHAINING',
-                                loadfactor=4.0,
+                                loadfactor=2.0,
                                 comparefunction=compareMapObrasMedios)
     catalog['nacionalidad'] = mp.newMap(30,
                                 maptype='CHAINING',
-                                loadfactor=4.0,
+                                loadfactor=2.0,
                                 )
-    catalog['id'] = mp.newMap(2000,
-                                maptype='PROBING',
-                                loadfactor=0.5,
+    catalog['id'] = mp.newMap(
+                                maptype='CHAINING',
+                                loadfactor=4.0,
                                 )
 
     return catalog
