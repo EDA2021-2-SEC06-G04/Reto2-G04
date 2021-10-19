@@ -25,6 +25,7 @@ import model
 import csv
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -54,7 +55,7 @@ def loadObras(catalog):
     """
     Carga las obras del archivo.
     """
-    file = cf.data_dir + 'Artworks-utf8-large.csv'
+    file = cf.data_dir + 'Artworks-utf8-small.csv'
     input_file = csv.DictReader(open(file, encoding='utf-8'))
     for obra in input_file:
         model.addObra(catalog, obra)
@@ -65,7 +66,7 @@ def loadArtistas(catalog):
     cada uno de ellos, se crea en la lista de artistas, a dicho artista y una
     referencia a la obra que se esta procesando.
     """
-    file = cf.data_dir + 'Artists-utf8-large.csv'
+    file = cf.data_dir + 'Artists-utf8-small.csv'
     input_file = csv.DictReader(open(file, encoding='utf-8'))
     for artista in input_file:
         model.addArtista(catalog, artista)
@@ -73,7 +74,48 @@ def loadArtistas(catalog):
 
 # Funciones de ordenamiento
 
+def organizarobras(catalog):
+    """
+    Organiza el catálogo por el método elegido
+    """
+    model.organizarobras(catalog['obras'])
+
+def organizarartistas(catalog):
+    """
+    Organiza los artistas por el método elegido
+    """
+    model.organizarartistas(catalog['artistas'],'date')
+
 # Funciones de consulta sobre el catálogo
+
+    #Requerimientos 1 y 2
+def rangoobras(catalog,fecha_inicial,fecha_final):
+    """
+    Crea y devuelve la sublista de catalog con las obras ordenadas desde una fecha
+    de inicio hasta otra de final.
+    """
+    return model.rangoobras(catalog['obras'],fecha_inicial,fecha_final)
+
+def no_compradas(lista):
+    return str(model.no_compradas(lista))
+
+def buscarid(id,catalog):
+    model.organizarartistas(catalog['artistas'],'ID')
+    elementos = model.buscarid(id,catalog['artistas'])
+    str = (lt.getElement(elementos,0))['DisplayName']
+    i = 1
+    while i < lt.size(elementos):
+        str += (', ' + (lt.getElement(elementos,i))['DisplayName'])
+        i += 1
+    return str
+
+def rangoartistas(catalog,fecha_inicial,fecha_final):
+    """
+    Crea y devuelve la sublista de catalog con los artistas ordenados desde una fecha
+    de inicio hasta otra de final.
+    """
+    return model.rangoartistas(catalog['artistas'],fecha_inicial,fecha_final)
+
 
 def antiguaspormedio(n,medio,catalog):
     """
