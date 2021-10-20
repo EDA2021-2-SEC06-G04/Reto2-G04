@@ -267,26 +267,21 @@ def agregarprecios(obras):
     while z <= lt.size(obras):
         costofinal = 0
         pesofinal = 0
+        costo_area = 0
+        costo_volumen = 0
         if lt.getElement(obras,z)['Weight (kg)'] != '':
             costofinal = 72.00 * float(lt.getElement(obras,z)['Weight (kg)'])
             pesofinal += float(lt.getElement(obras,z)['Weight (kg)'])
         if lt.getElement(obras,z)['Diameter (cm)'] != '':
             costo_area = 72.00 * ((2 * 3.1416 * (float(lt.getElement(obras,z)['Diameter (cm)'])/2) * float(lt.getElement(obras,z)['Diameter (cm)']) + 2 * 3.1416 * ((float(lt.getElement(obras,z)['Diameter (cm)'])/2) ** 2))/10000)
-        else:
-            try:
-                costo_area = 72.00 * (((2 * float(lt.getElement(obras,z)['Height (cm)']) * (float(lt.getElement(obras,z)['Depth (cm)']) + float(lt.getElement(obras,z)['Width (cm)']))) + (2 * float(lt.getElement(obras,z)['Depth (cm)'] * float(lt.getElement(obras,z)['Width (cm)']))))/10000)
-            except:
-                try:
-                    costo_area = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']))/10000)
-                except:
-                    costo_area = 0
+        elif (lt.getElement(obras,z)['Height (cm)'] != '') and (lt.getElement(obras,z)['Depth (cm)'] != '') and (lt.getElement(obras,z)['Width (cm)'] != ''):
+            costo_area = 72.00 * (((2 * float(lt.getElement(obras,z)['Height (cm)']) * (float(lt.getElement(obras,z)['Depth (cm)']) + float(lt.getElement(obras,z)['Width (cm)']))) + (2 * float(lt.getElement(obras,z)['Depth (cm)']) * float(lt.getElement(obras,z)['Width (cm)'])))/10000)
+        elif (lt.getElement(obras,z)['Height (cm)'] != '') and (lt.getElement(obras,z)['Width (cm)'] != ''):
+            costo_area = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']))/10000)
         if lt.getElement(obras,z)['Diameter (cm)'] != '':
             costo_volumen = 72.00 * (((3.1416 * (float(lt.getElement(obras,z)['Diameter (cm)'])/2) ** 2) * (float(lt.getElement(obras,z)['Height (cm)'])))/1000000)
-        else:
-            try:
-                costo_volumen = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']) * float(lt.getElement(obras,z)['Depth (cm)']))/1000000)
-            except:
-                costo_volumen = 0
+        elif (lt.getElement(obras,z)['Height (cm)'] != '') and (lt.getElement(obras,z)['Depth (cm)'] != '') and (lt.getElement(obras,z)['Width (cm)'] != ''):
+            costo_volumen = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']) * float(lt.getElement(obras,z)['Depth (cm)']))/1000000)
         if costo_area > costofinal:
             costofinal = costo_area
         if costo_volumen > costofinal:
