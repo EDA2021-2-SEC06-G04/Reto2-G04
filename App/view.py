@@ -41,6 +41,9 @@ def printMenu():
     print("1- Cargar información en el catálogo")
     print("2- Listar cronológicamente artistas")
     print("3- Listar cronológicamente adquisiciones")
+    print("4- Clasificar las obras de un artista por técnica")
+    #print("5- Clasificar obras por la nacionalidad de los artistas")
+    print("6- Transportar las obras de un departamento")
 
 def organizarartistas(catalog):
     """
@@ -53,6 +56,18 @@ def organizarobras(catalog):
     Organiza la lista obras del catálogo
     """
     controller.organizarobras(catalog)
+
+def catalogarobras(obrasartista):
+    """
+    Cataloga las obras de un artista por técnica de creación
+    """
+    return controller.catalogarobras(obrasartista)
+
+def agregarprecios(obras):
+    """
+    Agrega un precio de transporte a cada obra en la lista
+    """
+    return controller.agregarprecios(obras)
 
 catalog = None
 
@@ -138,6 +153,68 @@ while True:
                 dimensiones = 'Desconocidas'
             print('Titulo: ' + (lt.getElement(rangoobra,lt.size(rangoobra) - i))['Title'] + '   Artista(s): ' + controller.buscarid((lt.getElement(rangoobra,lt.size(rangoobra) - i))['ConstituentID'],catalog) + '    Fecha: ' + (lt.getElement(rangoobra,lt.size(rangoobra) - i))['Date'] + '    Fecha de adquisición: ' + (lt.getElement(rangoobra,lt.size(rangoobra) - i))['DateAcquired'] + '\nMedio: ' + (lt.getElement(rangoobra,lt.size(rangoobra) - i))['Medium'] + '    Dimensiones: ' + dimensiones + '\n\n')
             i -= 1
+
+    elif int(inputs[0]) == 4:
+        nombre_artista = input('Ingrese el nombre del artista a clasificar: ')
+        start_time = time.process_time()
+        print('\nClasificando las obras ...')
+        idartista = me.getValue(mp.get(catalog['nombres'],nombre_artista))['ConstituentID']
+        obrasartista = me.getValue(mp.get(catalog['id'],idartista))
+        catalogarobra = catalogarobras(obrasartista)
+        tecnicamayor = controller.tecnicamayor(catalogarobra) 
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print('\nEl programa se demoró '+ str(elapsed_time_mseg) + ' en ordenar los datos de muestra por medio de Merge sort.')
+        print('\nEl total de obras cargadas de ' + nombre_artista + ' es de ' + str(lt.size(obrasartista)))
+        print('\nEl total de técnicas utilizadas por el artista es de ' + str(mp.size(catalogarobra)))
+        print('\nLa técnica más usada por el artista fue ' + lt.getElement(tecnicamayor,1)['Medium'] + ' y sus elementos son:\n')
+        i = 1
+        while i <= lt.size(tecnicamayor):
+            dimensiones = lt.getElement(tecnicamayor,i)['Dimensions']
+            if dimensiones == '':
+                dimensiones = 'Desconocidas'
+            print('Titulo: ' + (lt.getElement(tecnicamayor,i))['Title'] + '    Fecha: ' + (lt.getElement(tecnicamayor,i))['Date'] + '   Medio: ' + (lt.getElement(tecnicamayor,i))['Medium'] + '    Dimensiones: ' + dimensiones + '\n\n')
+            i += 1
+
+    elif int(inputs[0]) == 6:
+        dpto = input('Ingrese el departamento del museo que quiere trasportar: ')
+        start_time = time.process_time()
+        obrasdpto = me.getValue(mp.get(catalog['departamento'],dpto))
+        costos = (agregarprecios(obrasdpto))[0]
+        costototal = (agregarprecios(obrasdpto))[1]
+        peso = (agregarprecios(obrasdpto))[2]
+        controller.organizarcostos(costos)
+        #print(costos)
+        print('\nCalculando costos de transporte...')
+        print('\nEl total de obras a transportar es de es de ' + str(lt.size(obrasdpto)))
+        print('\nEl servicio costará un total estimado de ' + str(round(costototal,3)) + 'USD')
+        print('\nEl peso estimado de la carga es de ' + str(round(peso,3)) + 'kg') 
+        print('\nLas 5 obras más costosas de transportar son:\n')
+        i = 1
+        while i <= 5:
+            dimensiones = lt.firstElement(lt.getElement(costos,i))['Dimensions']
+            if dimensiones == '':
+                dimensiones = 'Desconocidas'
+            print('Titulo: ' + lt.firstElement(lt.getElement(costos,i))['Title'] + '   Artista(s): ' + controller.buscarid(lt.firstElement(lt.getElement(costos,i))['ConstituentID'],catalog) + '    Fecha: ' + lt.firstElement(lt.getElement(costos,i))['Date'] + '    Clasificación: ' + lt.firstElement(lt.getElement(costos,i))['Classification'] + '\nMedio: ' + lt.firstElement(lt.getElement(costos,i))['Medium'] + '    Dimensiones: ' + dimensiones + '    Costo de transporte: ' + str(round(lt.lastElement(lt.getElement(costos,i)),3)) + '\n\n')
+            i += 1
+        controller.organizarfechas(costos)
+        print('\nLas 5 obras más antiguas a transportar son:\n')
+        aux = 0
+        i = 1
+        while aux < 5:
+            if lt.firstElement(lt.getElement(costos,i))['Date'] != '':
+                dimensiones = lt.firstElement(lt.getElement(costos,i))['Dimensions']
+                if dimensiones == '':
+                    dimensiones = 'Desconocidas'
+                print('Titulo: ' + lt.firstElement(lt.getElement(costos,i))['Title'] + '   Artista(s): ' + controller.buscarid(lt.firstElement(lt.getElement(costos,i))['ConstituentID'],catalog) + '    Fecha: ' + lt.firstElement(lt.getElement(costos,i))['Date'] + '    Clasificación: ' + lt.firstElement(lt.getElement(costos,i))['Classification'] + '\nMedio: ' + lt.firstElement(lt.getElement(costos,i))['Medium'] + '    Dimensiones: ' + dimensiones + '    Costo de transporte: ' + str(round(lt.lastElement(lt.getElement(costos,i)),3)) + '\n\n')
+                aux += 1 
+            i += 1
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print('\nEl programa se demoró '+ str(elapsed_time_mseg) + ' en ordenar los datos de muestra por medio de Merge sort.')
+
+    elif int(inputs[0]) == 0:
+        catalog = None
 
     else:
         sys.exit(0)

@@ -58,7 +58,15 @@ def newCatalog():
                                 maptype='CHAINING',
                                 loadfactor=2.0,
                                 )
+    catalog['nombres'] = mp.newMap(
+                                maptype='CHAINING',
+                                loadfactor=4.0,
+                                )
     catalog['id'] = mp.newMap(
+                                maptype='CHAINING',
+                                loadfactor=4.0,
+                                )
+    catalog['departamento'] = mp.newMap(20,
                                 maptype='CHAINING',
                                 loadfactor=4.0,
                                 )
@@ -68,39 +76,50 @@ def newCatalog():
 # Funciones para agregar informacion al catalogo
 def addObra(catalog, obra):
     lt.addLast(catalog['obras'], obra)
-    try:
-        lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
-    except:
-        mp.put(catalog['medio'],obra['Medium'],lt.newList(datastructure='ARRAY_LIST')) 
-        lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
+    if not mp.contains(catalog['medio'],obra['Medium']):
+        mp.put(catalog['medio'],obra['Medium'],lt.newList(datastructure='ARRAY_LIST'))         
+    lt.addLast(me.getValue(mp.get(catalog['medio'],obra['Medium'])),obra)
+    idsobra = obra['ConstituentID']
+    x = idsobra.replace('[','')
+    y = x.replace(']','')
+    z = y.replace(' ','')
+    ids = z.split(',')
+    for id in ids:
+        if not mp.contains(catalog['id'],id):
+            mp.put(catalog['id'],id,lt.newList(datastructure='ARRAY_LIST'))     
+        lt.addLast(me.getValue(mp.get(catalog['id'],id)),obra)
+    if not mp.contains(catalog['departamento'],obra['Department']):
+        mp.put(catalog['departamento'],obra['Department'],lt.newList(datastructure='ARRAY_LIST'))
+    lt.addLast(me.getValue(mp.get(catalog['departamento'],obra['Department'])),obra)
     
-def nacionalidades(catalog):
-    for obra in lt.iterator(catalog['obras']):
-        idsobra = obra['ConstituentID']
-        x = idsobra.replace('[','')
-        y = x.replace(']','')
-        z = y.replace(' ','')
-        ids = z.split(',')
-        nacionalidades = lt.newList(datastructure='ARRAY_LIST')
-        for id in ids:
-            if lt.isPresent(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality']) == False:
+    
+#def nacionalidades(catalog):
+    #for obra in lt.iterator(catalog['obras']):
+        #idsobra = obra['ConstituentID']
+        #x = idsobra.replace('[','')
+        #y = x.replace(']','')
+        #z = y.replace(' ','')
+        #ids = z.split(',')
+        #nacionalidades = lt.newList(datastructure='ARRAY_LIST')
+        #for id in ids:
+         #   if lt.isPresent(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality']) == False:
                 #print(ids)
-                lt.addLast(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality'])
+          #      lt.addLast(nacionalidades,me.getValue(mp.get(catalog['id'],id))['Nationality'])
                 #print(nacionalidades)
-        for paisartista in lt.iterator(nacionalidades):
-            try:
+        #for paisartista in lt.iterator(nacionalidades):
+         #   try:
                 #print(paisartista)
                 #print(mp.get(catalog['nacionalidad'],paisartista))
-                lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
-            except:
-                mp.put(catalog['nacionalidad'],paisartista,lt.newList(datastructure='ARRAY_LIST')) 
-                lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
+          #      lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
+           # except:
+            #    mp.put(catalog['nacionalidad'],paisartista,lt.newList(datastructure='ARRAY_LIST')) 
+             #   lt.addLast(me.getValue(mp.get(catalog['nacionalidad'],paisartista)),obra)
             
 
 
 def addArtista(catalog, artista):
     lt.addLast(catalog['artistas'], artista)
-    mp.put(catalog['id'],artista['ConstituentID'],artista)
+    mp.put(catalog['nombres'],artista['DisplayName'],artista)
 
 
 
@@ -210,6 +229,76 @@ def rangoartistas(artistas,fecha_inicial,fecha_final):
     rango = lt.subList(artistas,indiceinicial,(indicefinal-indiceinicial+1))
     return rango
 
+    #Requerimiento 3
+def catalogarmedios(lista):
+    dicc = mp.newMap(maptype='PROBING',numelements=25)
+    z = 1
+    while z <= lt.size(lista):
+        if not(mp.contains(dicc,(lt.getElement(lista,z))['Medium'])):
+            mp.put(dicc,(lt.getElement(lista,z))['Medium'],lt.newList(datastructure='ARRAY_LIST'))
+        lt.addLast((mp.get(dicc,(lt.getElement(lista,z))['Medium']))['value'],lt.getElement(lista,z))   
+        z += 1
+    return dicc
+
+def tecnicamayor(obrasartista):
+    """
+    Devuelve la lista de obras de la técnica más usada entre las obras
+    """
+    iterador = lt.iterator(mp.keySet(obrasartista))
+    mayor = ''
+    for key in iterador:
+        #if mayor != '':
+        
+        try:
+            if lt.size(me.getValue(mp.get(obrasartista,key))) > lt.size(me.getValue(mp.get(obrasartista,mayor))):
+                mayor = key                
+        except:
+            mayor = key
+    return me.getValue(mp.get(obrasartista,mayor))
+
+    #Requerimiento 5
+def agregarprecios(obras):
+    """
+    Agrega una columna de precio de transporte a cada obra en la lista
+    """
+    costos = lt.newList(datastructure='ARRAY_LIST')
+    costototal = 0
+    z = 1
+    while z <= lt.size(obras):
+        costofinal = 0
+        pesofinal = 0
+        if lt.getElement(obras,z)['Weight (kg)'] != '':
+            costofinal = 72.00 * float(lt.getElement(obras,z)['Weight (kg)'])
+            pesofinal += float(lt.getElement(obras,z)['Weight (kg)'])
+        if lt.getElement(obras,z)['Diameter (cm)'] != '':
+            costo_area = 72.00 * ((2 * 3.1416 * (float(lt.getElement(obras,z)['Diameter (cm)'])/2) * float(lt.getElement(obras,z)['Diameter (cm)']) + 2 * 3.1416 * ((float(lt.getElement(obras,z)['Diameter (cm)'])/2) ** 2))/10000)
+        else:
+            try:
+                costo_area = 72.00 * (((2 * float(lt.getElement(obras,z)['Height (cm)']) * (float(lt.getElement(obras,z)['Depth (cm)']) + float(lt.getElement(obras,z)['Width (cm)']))) + (2 * float(lt.getElement(obras,z)['Depth (cm)'] * float(lt.getElement(obras,z)['Width (cm)']))))/10000)
+            except:
+                try:
+                    costo_area = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']))/10000)
+                except:
+                    costo_area = 0
+        if lt.getElement(obras,z)['Diameter (cm)'] != '':
+            costo_volumen = 72.00 * (((3.1416 * (float(lt.getElement(obras,z)['Diameter (cm)'])/2) ** 2) * (float(lt.getElement(obras,z)['Height (cm)'])))/1000000)
+        else:
+            try:
+                costo_volumen = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']) * float(lt.getElement(obras,z)['Depth (cm)']))/1000000)
+            except:
+                costo_volumen = 0
+        if costo_area > costofinal:
+            costofinal = costo_area
+        if costo_volumen > costofinal:
+            costofinal = costo_volumen
+        if costofinal == 0:
+            costofinal = 48.00
+        lt.addLast(costos,lt.newList('ARRAY_LIST'))
+        lt.addLast(lt.getElement(costos,z),lt.getElement(obras,z))
+        lt.addLast(lt.getElement(costos,z),costofinal)
+        costototal += costofinal
+        z += 1
+    return (costos,costototal,pesofinal)
 
 
 # Funciones de ordenamiento
@@ -234,6 +323,12 @@ def organizarartistas(artistas,cmpf):
         mergesort.sort(artistas,cmpArtistsByConstituentID)
     else:
         mergesort.sort(artistas,cmpArtistsByDate)
+
+def organizarcostos(costos):
+    """
+    Organiza los costos por el método elegido
+    """
+    mergesort.sort(costos,cmpArtworkByCost)
 
 # Funciones de comparación
 def compareMapObrasMedios(keyname, medio):

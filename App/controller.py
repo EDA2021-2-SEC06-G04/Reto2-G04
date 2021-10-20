@@ -48,7 +48,7 @@ def loadData(catalog):
     
     loadArtistas(catalog)
     loadObras(catalog)
-    model.nacionalidades(catalog)
+    #model.nacionalidades(catalog)
 
 
 def loadObras(catalog):
@@ -85,6 +85,18 @@ def organizarartistas(catalog):
     Organiza los artistas por el método elegido
     """
     model.organizarartistas(catalog['artistas'],'date')
+
+def organizarcostos(costos):
+    """
+    Organiza las obras por su costo de transporte
+    """
+    model.organizarcostos(costos)
+
+def organizarfechas(costos):
+    """
+    Organiza las obras por su año de creación
+    """
+    model.organizarfechas(costos)
 
 # Funciones de consulta sobre el catálogo
 
@@ -125,3 +137,24 @@ def antiguaspormedio(n,medio,catalog):
     print(medio)
     lista = model.antiguaspormedio(n,medio,catalog)
     return lista
+
+    #Requerimiento 3
+def catalogarobras(obrasartista):
+    """
+    Cataloga las obras de un artista por técnica de creación
+    """
+    dicc = model.catalogarmedios(obrasartista)
+    return dicc
+
+def tecnicamayor(obrasartista):
+    """
+    Devuelve la lista de obras de la técnica más usada entre las obras de la lista
+    """
+    return model.tecnicamayor(obrasartista)
+
+    #Requerimiento 5
+def agregarprecios(obras):
+    """
+    Agrega una columna de precio de transporte a cada obra en la lista
+    """
+    return model.agregarprecios(obras)
