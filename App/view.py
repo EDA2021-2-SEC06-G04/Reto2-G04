@@ -169,12 +169,13 @@ while True:
         print('\nEl total de técnicas utilizadas por el artista es de ' + str(mp.size(catalogarobra)))
         print('\nLa técnica más usada por el artista fue ' + lt.getElement(tecnicamayor,1)['Medium'] + ' y sus elementos son:\n')
         i = 1
-        while i <= lt.size(tecnicamayor):
-            dimensiones = lt.getElement(tecnicamayor,i)['Dimensions']
-            if dimensiones == '':
-                dimensiones = 'Desconocidas'
-            print('Titulo: ' + (lt.getElement(tecnicamayor,i))['Title'] + '    Fecha: ' + (lt.getElement(tecnicamayor,i))['Date'] + '   Medio: ' + (lt.getElement(tecnicamayor,i))['Medium'] + '    Dimensiones: ' + dimensiones + '\n\n')
-            i += 1
+        #while i <= lt.size(tecnicamayor):
+         #   dimensiones = lt.getElement(tecnicamayor,i)['Dimensions']
+          #  if dimensiones == '':
+           #     dimensiones = 'Desconocidas'
+            #print('Titulo: ' + (lt.getElement(tecnicamayor,i))['Title'] + '    Fecha: ' + (lt.getElement(tecnicamayor,i))['Date'] + '   Medio: ' + (lt.getElement(tecnicamayor,i))['Medium'] + '    Dimensiones: ' + dimensiones + '\n\n')
+            #i += 1
+        
 
     elif int(inputs[0]) == 6:
         dpto = input('Ingrese el departamento del museo que quiere trasportar: ')

@@ -46,25 +46,24 @@ def newCatalog():
     """
     catalog = {'obras': None,
                'artistas': None,
-               'medio': None}
+               'medio': None,
+               'nombres': None,
+               'id': None,
+               'departamento': None}
 
     catalog['obras'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['artistas'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['medio'] = mp.newMap(30,
                                 maptype='CHAINING',
-                                loadfactor=2.0,
-                                comparefunction=compareMapObrasMedios)
-    catalog['nacionalidad'] = mp.newMap(30,
-                                maptype='CHAINING',
-                                loadfactor=2.0,
-                                )
-    catalog['nombres'] = mp.newMap(
-                                maptype='CHAINING',
                                 loadfactor=4.0,
+                                comparefunction=compareMapObrasMedios)
+    catalog['nombres'] = mp.newMap(
+                                maptype='PROBING',
+                                loadfactor=0.5,
                                 )
     catalog['id'] = mp.newMap(
-                                maptype='CHAINING',
-                                loadfactor=4.0,
+                                maptype='PROBING',
+                                loadfactor=0.5,
                                 )
     catalog['departamento'] = mp.newMap(20,
                                 maptype='CHAINING',
@@ -278,7 +277,7 @@ def agregarprecios(obras):
             costo_area = 72.00 * (((2 * float(lt.getElement(obras,z)['Height (cm)']) * (float(lt.getElement(obras,z)['Depth (cm)']) + float(lt.getElement(obras,z)['Width (cm)']))) + (2 * float(lt.getElement(obras,z)['Depth (cm)']) * float(lt.getElement(obras,z)['Width (cm)'])))/10000)
         elif (lt.getElement(obras,z)['Height (cm)'] != '') and (lt.getElement(obras,z)['Width (cm)'] != ''):
             costo_area = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']))/10000)
-        if lt.getElement(obras,z)['Diameter (cm)'] != '':
+        if (lt.getElement(obras,z)['Diameter (cm)'] != '') and (lt.getElement(obras,z)['Height (cm)'] != ''):
             costo_volumen = 72.00 * (((3.1416 * (float(lt.getElement(obras,z)['Diameter (cm)'])/2) ** 2) * (float(lt.getElement(obras,z)['Height (cm)'])))/1000000)
         elif (lt.getElement(obras,z)['Height (cm)'] != '') and (lt.getElement(obras,z)['Depth (cm)'] != '') and (lt.getElement(obras,z)['Width (cm)'] != ''):
             costo_volumen = 72.00 * ((float(lt.getElement(obras,z)['Width (cm)']) * float(lt.getElement(obras,z)['Height (cm)']) * float(lt.getElement(obras,z)['Depth (cm)']))/1000000)
